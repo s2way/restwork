@@ -1,4 +1,4 @@
-Server = require '../fw/server'
+Server = require '../src/server'
 expect = require 'expect.js'
 
 describe 'The Server', ->

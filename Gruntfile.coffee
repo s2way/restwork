@@ -2,14 +2,14 @@ module.exports = (grunt) ->
   grunt.initConfig {
     watch:
       scripts:
-        files: ['**/*.coffee']
+        files: ['app/**/*.coffee']
         tasks: ['mochaTest']
     mochaTest:
       test:
         options:
           reporter: 'spec'
           require: 'coffee-script/register'
-        src: ['test/**/*.coffee', 'fwtest/**/*.coffee']
+        src: ['app/test/**/*.coffee']
   }
 
   grunt.loadNpmTasks 'grunt-mocha-test'
