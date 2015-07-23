@@ -14,7 +14,8 @@
     "underscore": "~1.8.3",
     "bunyan": "~1.4.0",
     "node-persist": "0.0.6",
-    "node-uuid": "~1.4.3"
+    "node-uuid": "~1.4.3",
+    "restwork-oauth": "git://github.com/Moharu/restwork-oauth.git"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
