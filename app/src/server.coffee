@@ -8,12 +8,12 @@ class Server
         @_loadGeneralHandlers()
         @_loadRoutes @routes
         bunyan = require 'bunyan'
-        @server.on 'after', @restify.auditLogger(
-            log: bunyan.createLogger(
-                name: 'audit'
-                stream: process.stdout
-            )
-        )
+        # @server.on 'after', @restify.auditLogger(
+        #     log: bunyan.createLogger(
+        #         name: 'audit'
+        #         stream: process.stdout
+        #     )
+        # )
         @server.listen port, startCallback
 
 

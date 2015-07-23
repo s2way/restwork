@@ -71,18 +71,22 @@ describe 'The Server', ->
             receivedGetCalled = false
             
             routes =
-                resource1:
-                    doSomething1:
+                resource1: [
+                    {
                         httpMethod: 'put'
                         url: '/something1/'
-                        method: () ->
+                        method: ->
                             receivedPutCalled = true
-                resource2:
-                    doSomething2:
+                    }
+                ]
+                resource2: [
+                    {
                         httpMethod: 'get'
                         url: '/something2/'
-                        method: () ->
+                        method: ->
                             receivedGetCalled = true
+                    }
+                ]
 
             receivedPutUrl = null
             receivedGetUrl = null
@@ -98,6 +102,6 @@ describe 'The Server', ->
             instance._loadRoutes routes
 
             expect(receivedPutCalled).to.be.ok()
-            expect(receivedPutUrl).to.eql routes.resource1.doSomething1.url
+            expect(receivedPutUrl).to.eql routes.resource1[0].url
             expect(receivedGetCalled).to.be.ok()
-            expect(receivedGetUrl).to.eql routes.resource2.doSomething2.url
+            expect(receivedGetUrl).to.eql routes.resource2[0].url
