@@ -37,5 +37,8 @@ class Server
                 endpoint: @handlers.easyOauth.endpoint
                 tokenValidity: @handlers.easyOauth.expiry
             @oauth.easyOauth @server, params
+            @server.use (req, res, next) ->
+                res.sendUnauthenticated() unless req?.username?
+                next()
 
 module.exports = Server
