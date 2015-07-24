@@ -14,7 +14,7 @@ class fsConnector
     create: (data, callback) ->
         id = String(data.id) || "#{order}_#{uuid.v4().substr(-12)}"
         file = path.join @prefix, id
-        return callback null, yes if @files.isFile file
+        return callback 'File already exists.' if @files.isFile file
         try
             @files.createFileIfNotExists file, JSON.stringify(data)
             callback null, yes

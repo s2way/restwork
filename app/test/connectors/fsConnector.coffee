@@ -23,7 +23,7 @@ describe 'the fsConnector,', ->
 
     describe 'when creating a new file', (done) ->
 
-        it 'should hand to the module the id as the filename and the data to be persisted ', (done) ->
+        it 'should return an error if the file already exists', (done) ->
 
             params =
                 domain: 'Pay'
@@ -38,7 +38,7 @@ describe 'the fsConnector,', ->
 
             instance = new fsConnector params, fs : nodePersistMock
             instance.create expectedData, (err) ->
-                expect(err).not.to.be.ok()
+                expect(err).to.be 'File already exists.'
                 done()
 
         it 'should hand to the module the id as the filename and the data to be persisted ', (done) ->
