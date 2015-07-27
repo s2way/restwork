@@ -12,14 +12,14 @@ describe 'the HttpConnector,', ->
             expectedUrl = 'http://localhost:1234'
             receivedUrl = null
 
-            class restify
+            class Restify
                 @createStringClient: (options)->
                     receivedUrl = options.url
                     mockPost =
                         post: ->
 
             deps =
-                restify: restify
+                restify: Restify
 
             params =
                 url: expectedUrl
@@ -37,7 +37,7 @@ describe 'the HttpConnector,', ->
                 message: 'Test data'
             receivedData = null
 
-            class restify
+            class Restify
                 @createStringClient: (options)->
                     client =
                         post: (path, object, callback) ->
@@ -45,7 +45,7 @@ describe 'the HttpConnector,', ->
                             receivedData = object
 
             deps =
-                restify: restify
+                restify: Restify
 
             params =
                 url: ''
@@ -62,14 +62,14 @@ describe 'the HttpConnector,', ->
             expectedError =
                 message: 'Any error'
 
-            class restify
+            class Restify
                 @createStringClient: (options)->
                     client =
                         post: (path, object, callback) ->
                             callback expectedError
 
             deps =
-                restify: restify
+                restify: Restify
 
             params =
                 url: ''
@@ -87,14 +87,14 @@ describe 'the HttpConnector,', ->
             expectedResponse =
                 message: 'Any response'
 
-            class restify
+            class Restify
                 @createStringClient: (options)->
                     client =
                         post: (path, object, callback) ->
                             callback null, null, null, expectedResponse
 
             deps =
-                restify: restify
+                restify: Restify
 
             params =
                 url: ''

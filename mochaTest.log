@@ -8,6 +8,13 @@
 [2K[0G    [32m  ✓[0m[90m should hand to the module the id as the filename and the data to be persisted [0m
 [2K[0G    [32m  ✓[0m[90m should catch the exception if thrown[0m
 
+[0m  the HttpConnector,[0m
+[0m    when the post method is called[0m
+[2K[0G    [32m  ✓[0m[90m should instantiate restify http client with the passed url[0m
+[2K[0G    [32m  ✓[0m[90m should call post with the right params[0m
+[2K[0G    [32m  ✓[0m[90m should return an error if there was an error in the request[0m
+[2K[0G    [32m  ✓[0m[90m should return the response from the request[0m
+
 [0m  The Server[0m
 [0m    start method[0m
 [2K[0G    [32m  ✓[0m[90m should create a new restify server instance[0m
@@ -22,5 +29,5 @@
 [2K[0G    [32m  ✓[0m[90m should register the default listeners[0m
 
 
-[92m [0m[32m 11 passing[0m[90m (324ms)[0m
+[92m [0m[32m 15 passing[0m[90m (286ms)[0m
 
