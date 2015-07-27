@@ -3,7 +3,7 @@
 path = require 'path'
 uuid = require 'node-uuid'
 
-class fsConnector
+class FsConnector
 
     constructor: (params, deps) ->
         @files = deps?.fs || require('waferpie-utils').Files
@@ -23,4 +23,4 @@ class fsConnector
         catch e
             callback e
 
-module.exports = fsConnector
+module.exports = FsConnector

@@ -29,6 +29,8 @@ describe 'The Server', ->
                     restifyServerInstanceCreated = true
                     server =
                         listen: () ->
+            instance._registerListeners = () ->
+
             instance.start()
 
             expect(restifyServerInstanceCreated).to.be.ok()
@@ -38,6 +40,8 @@ describe 'The Server', ->
             _loadRoutesCalled = false
             instance._loadRoutes = () ->
                 _loadRoutesCalled = true
+            instance._registerListeners = () ->
+
             instance.start()
 
             expect(_loadRoutesCalled).to.be.ok()
@@ -55,6 +59,7 @@ describe 'The Server', ->
                         listen: (port, callback) ->
                             receivedPort = port
                             receivedCallback = callback
+            instance._registerListeners = () ->
 
             instance.start expectedPort, expectedCallback
             expect(receivedPort).to.eql expectedPort
@@ -107,3 +112,106 @@ describe 'The Server', ->
             expect(receivedPutUrl).to.eql routes.resource1[0].url
             expect(receivedGetCalled).to.be.ok()
             expect(receivedGetUrl).to.eql routes.resource2[0].url
+
+    describe '_loadGeneralHandlers method', ->
+
+        instance = null
+
+        beforeEach ->
+            instance = new Server
+
+        it 'should add handlers to the server', ->
+
+            methodsCalled = []
+
+            instance.server =
+                use : (methodName) ->
+                    methodsCalled.push methodName
+            instance.restify =
+                authorizationParser : ->
+                    'authorizationParser'
+                bodyParser : ->
+                    'bodyParser'
+                queryParser : ->
+                    'queryParser'
+            instance.handlers =
+                authorizationParser : true
+                bodyParser : true
+                queryParser : true
+            instance._loadGeneralHandlers()
+
+            expect(methodsCalled).to.contain 'authorizationParser'
+            expect(methodsCalled).to.contain 'bodyParser'
+            expect(methodsCalled).to.contain 'queryParser'
+
+
+         it 'should add handlers to the server', ->
+
+            methodsCalled = []
+            actualParams = null
+            res =
+                sendUnauthenticated : ->
+
+            instance.server =
+                use : (methodName) ->
+                    methodName(null, res, ->)
+                    methodsCalled.push methodName.toString()
+            instance.restify =
+                authorizationParser : ->
+                    authorizationParser = ->
+                bodyParser : ->
+                    bodyParser = ->
+                queryParser : ->
+                    queryParser = ->
+            instance.handlers =
+                authorizationParser : true
+                bodyParser : true
+                queryParser : true
+                easyOauth :
+                    enable : true
+                    secret : 'secret'
+                    clients : 'clients'
+                    endpoint:  'endpoint'
+                    expiry: 'expiry'
+            instance.oauth =
+                easyOauth : (server, params)->
+                    actualParams = params
+            instance._loadGeneralHandlers()
+
+            expect(methodsCalled).to.contain instance.restify.authorizationParser().toString()
+            expect(methodsCalled).to.contain instance.restify.bodyParser().toString()
+            expect(methodsCalled).to.contain instance.restify.queryParser().toString()
+            expect(actualParams.secret).to.eql 'secret'
+            expect(actualParams.clients).to.eql 'clients'
+            expect(actualParams.endpoint).to.eql 'endpoint'
+            expect(actualParams.tokenValidity).to.eql 'expiry'
+
+    describe '_registerListeners method', ->
+
+        instance = null
+
+        beforeEach ->
+            instance = new Server
+
+        it 'should register the default listeners', ->
+
+            methodsCalled = []
+
+            bkpLog = console.log
+            console.log = ->
+            instance.server =
+                on:(event, method) ->
+                    methodsCalled.push event
+                    method null, null, null, stack: 'stack'
+            instance.restify =
+                auditLogger: ->
+                    logger = ->
+            instance.bunyan =
+                createLogger: ->
+            instance._log = ->
+
+            instance._registerListeners()
+            expect(methodsCalled).to.contain 'after'
+            expect(methodsCalled).to.contain 'error'
+            expect(methodsCalled).to.contain 'uncaughtException'
+            console.log = bkpLog

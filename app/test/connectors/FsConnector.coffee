@@ -1,6 +1,6 @@
 'use strict'
 
-fsConnector = require '../../src/connectors/fsConnector'
+FsConnector = require '../../src/connectors/FsConnector'
 expect = require 'expect.js'
 
 describe 'the fsConnector,', ->
@@ -13,7 +13,7 @@ describe 'the fsConnector,', ->
                 domain: 'Pay'
                 resource: 'Order'
 
-            class nodePersistMock
+            class NodePersistMock
                 first = yes
                 @createDirIfNotExists: (dir) ->
                     expect(dir).to.be 'Pay' if first
@@ -21,7 +21,7 @@ describe 'the fsConnector,', ->
                     done() if !first
                     first = no
 
-            instance = new fsConnector params, fs : nodePersistMock
+            instance = new FsConnector params, fs : NodePersistMock
 
     describe 'when creating a new file', (done) ->
 
@@ -35,16 +35,18 @@ describe 'the fsConnector,', ->
                 id: 123
                 name: 'Michel Teló'
 
-            class nodePersistMock
+            class NodePersistMock
                 @isFile: -> true
 
-            instance = new fsConnector params, fs : nodePersistMock
+            instance = new FsConnector params, fs : NodePersistMock
             instance.create expectedData, (err) ->
                 expect(err).to.be 'File already exists.'
                 done()
 
         it 'should hand to the module the id as the filename and the data to be persisted ', (done) ->
 
+            fileNameExpect = null
+            dataExpect = null
             params =
                 domain: 'Pay'
                 resource: 'Order'
@@ -53,12 +55,35 @@ describe 'the fsConnector,', ->
                 id: 123
                 name: 'Michel Teló'
 
-            class nodePersistMock
+            class NodePersistMock
                 @isFile: -> false
                 @createFileIfNotExists: (filename, data) ->
-                    expect(filename).to.be 123
-                    expect(data).to.eql expectedData
+                    expect(filename).to.be 'Pay/Order/123'
+                    expect(data).to.eql JSON.stringify(expectedData)
 
-            instance = new fsConnector params, fs : nodePersistMock
-            instance.create expectedData, ->
+            instance = new FsConnector params, fs : NodePersistMock
+            instance.create expectedData, (error, response)->
+                expect(response).to.be.ok()
+                done()
+
+        it 'should catch the exception if thrown', (done) ->
+
+            fileNameExpect = null
+            dataExpect = null
+            params =
+                domain: 'Pay'
+                resource: 'Order'
+
+            expectedData =
+                id: 123
+                name: 'Michel Teló'
+
+            class NodePersistMock
+                @isFile: -> false
+                @createFileIfNotExists: (filename, data) ->
+                    throw new Error 'Michel Teló'
+
+            instance = new FsConnector params, fs : NodePersistMock
+            instance.create expectedData, (error, response)->
+                expect(error.toString()).to.be 'Error: Michel Teló'
                 done()
