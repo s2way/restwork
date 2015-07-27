@@ -1,3 +1,5 @@
+'use strict'
+
 class Server
 
     constructor: (@routes, @handlers, deps) ->

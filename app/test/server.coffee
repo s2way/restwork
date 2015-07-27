@@ -1,3 +1,5 @@
+'use strict'
+
 Server = require '../src/server'
 expect = require 'expect.js'
 
