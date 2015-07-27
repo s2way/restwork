@@ -1,3 +1,5 @@
+'use strict'
+
 path = require 'path'
 uuid = require 'node-uuid'
 

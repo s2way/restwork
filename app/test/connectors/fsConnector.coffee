@@ -1,3 +1,5 @@
+'use strict'
+
 fsConnector = require '../../src/connectors/fsConnector'
 expect = require 'expect.js'
 
