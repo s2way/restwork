@@ -9,15 +9,10 @@ class Server
         @server = @_createServer()
         @_loadGeneralHandlers()
         @_loadRoutes @routes
-        # @server.on 'after', @restify.auditLogger(
-        #     log: bunyan.createLogger(
-        #         name: 'audit'
-        #         stream: process.stdout
-        #     )
-        # )
+        @_registerListeners()
         @server.listen port, startCallback
 
-    _createServer: () ->
+    _createServer: ->
         return @restify.createServer()
 
     _loadRoutes: (routes) ->
@@ -26,7 +21,7 @@ class Server
                 @server[route.httpMethod] route.url, route.method
 
     #TODO: Enable the use of configured general handlers (restify .use)
-    _loadGeneralHandlers: () ->
+    _loadGeneralHandlers: ->
         @server.use @restify.authorizationParser() if @handlers?.authorizationParser?
         @server.use @restify.bodyParser(mapParams: false) if @handlers?.bodyParser?
         @server.use @restify.queryParser(mapParams: false) if @handlers?.queryParser?
@@ -40,5 +35,17 @@ class Server
             @server.use (req, res, next) ->
                 res.sendUnauthenticated() unless req?.username?
                 next()
+
+    _registerListeners: ->
+        @server.on 'after', @restify.auditLogger(
+            log: @bunyan.createLogger(
+                name: 'audit'
+                stream: process.stdout
+            )
+        )
+        @server.on 'error', (req, res, route, err) ->
+            console.log err.stack
+        @server.on 'uncaughtException', (req, res, route, err) ->
+            console.log err.stack
 
 module.exports = Server
