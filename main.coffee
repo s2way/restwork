@@ -1,3 +1,3 @@
 module.exports = require './app/src/server'
-module.exports.fsConnector = require './app/src/connectors/FsConnector'
-module.exports.httpConnector = require './app/src/connectors/HttpConnector'
+module.exports.FsConnector = require './app/src/connectors/FsConnector'
+module.exports.HttpConnector = require './app/src/connectors/HttpConnector'
