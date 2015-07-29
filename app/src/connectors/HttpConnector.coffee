@@ -11,7 +11,7 @@ class HttpConnector
     post: (params, callback) ->
         client = @restify.createStringClient url:params.url
 
-        path = params?.path || '/'
+        path = params?.path || ''
 
         client.post path, params?.data, (err, req, res, data) ->
             return callback err if err?
