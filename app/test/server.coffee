@@ -197,8 +197,6 @@ describe 'The Server', ->
 
             methodsCalled = []
 
-            bkpLog = console.log
-            console.log = ->
             instance.server =
                 on:(event, method) ->
                     methodsCalled.push event
@@ -214,4 +212,3 @@ describe 'The Server', ->
             expect(methodsCalled).to.contain 'after'
             expect(methodsCalled).to.contain 'error'
             expect(methodsCalled).to.contain 'uncaughtException'
-            console.log = bkpLog

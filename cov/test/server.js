@@ -221,10 +221,8 @@
         return instance = new Server;
       });
       return it('should register the default listeners', function() {
-        var bkpLog, methodsCalled;
+        var methodsCalled;
         methodsCalled = [];
-        bkpLog = console.log;
-        console.log = function() {};
         instance.server = {
           on: function(event, method) {
             methodsCalled.push(event);
@@ -246,8 +244,7 @@
         instance._registerListeners();
         expect(methodsCalled).to.contain('after');
         expect(methodsCalled).to.contain('error');
-        expect(methodsCalled).to.contain('uncaughtException');
-        return console.log = bkpLog;
+        return expect(methodsCalled).to.contain('uncaughtException');
       });
     });
   });
