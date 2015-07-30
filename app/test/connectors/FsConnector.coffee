@@ -2,7 +2,6 @@
 
 FsConnector = require '../../src/connectors/FsConnector'
 expect = require 'expect.js'
-mockFs = require 'mock-fs'
 
 describe 'the fsConnector,', ->
 
