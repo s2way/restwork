@@ -2,26 +2,9 @@
 
 FsConnector = require '../../src/connectors/FsConnector'
 expect = require 'expect.js'
+mockFs = require 'mock-fs'
 
 describe 'the fsConnector,', ->
-
-    describe 'when being constructed', ->
-
-        it 'should set the prefix to domain/resource', (done) ->
-
-            params =
-                domain: 'Pay'
-                resource: 'Order'
-
-            class NodePersistMock
-                first = yes
-                @createDirIfNotExists: (dir) ->
-                    expect(dir).to.be 'Pay' if first
-                    expect(dir).to.be 'Pay/Order' if !first
-                    done() if !first
-                    first = no
-
-            instance = new FsConnector params, fs : NodePersistMock
 
     describe 'when creating a new file', (done) ->
 
@@ -37,11 +20,15 @@ describe 'the fsConnector,', ->
 
             class NodePersistMock
                 @isFile: -> true
+                @createDirIfNotExists: (dir) ->
+                    expect(dir).to.be 'Pay' if first
+                    expect(dir).to.be 'Pay/Order' if !first
+                    done() if !first
+                    first = no
 
             instance = new FsConnector params, fs : NodePersistMock
             instance.create expectedData, (err) ->
                 expect(err).to.be 'File already exists.'
-                done()
 
         it 'should hand to the module the id as the filename and the data to be persisted ', (done) ->
 
@@ -58,8 +45,8 @@ describe 'the fsConnector,', ->
             class NodePersistMock
                 @isFile: -> false
                 @createFileIfNotExists: (filename, data) ->
-                    expect(filename).to.be 'Pay/Order/123'
-                    expect(data).to.eql JSON.stringify(expectedData)
+                    expect(filename).to.be 'Pay/Order/123.json'
+                    expect(data).to.eql JSON.stringify expectedData
 
             instance = new FsConnector params, fs : NodePersistMock
             instance.create expectedData, (error, response)->
@@ -87,3 +74,25 @@ describe 'the fsConnector,', ->
             instance.create expectedData, (error, response)->
                 expect(error.toString()).to.be 'Error: Michel Teló'
                 done()
+
+    describe 'when reading from a file', ->
+
+        it 'should read from a file and return its contents', (done) ->
+
+            params =
+                domain: 'Pay'
+                resource: 'Order'
+
+            class NodePersistMock
+                @isFile: ->
+                @createFileIfNotExists: ->
+
+            instance = new FsConnector params, fs : NodePersistMock
+
+            instance.read '', '1.json', (err, success) ->
+                expect(err).to.be.ok()
+                done()
+
+
+
+

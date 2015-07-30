@@ -22,13 +22,23 @@
     FsConnector.prototype.create = function(data, callback) {
       var e, file, id;
       id = String(data.id) || (order + "_" + (uuid.v4().substr(-12)));
-      file = path.join(this.prefix, id);
+      file = path.join(this.prefix, id + ".json");
       if (this.files.isFile(file)) {
         return callback('File already exists.');
       }
       try {
         this.files.createFileIfNotExists(file, JSON.stringify(data));
         return callback(null, true);
+      } catch (_error) {
+        e = _error;
+        return callback(e);
+      }
+    };
+
+    FsConnector.prototype.read = function(basePath, id, callback) {
+      var e;
+      try {
+        return callback(null, require(path.join(basePath, this.prefix, id)));
       } catch (_error) {
         e = _error;
         return callback(e);

@@ -50,5 +50,4 @@ class Server
         @server.on 'uncaughtException', (req, res, route, err) ->
             console.log err.stack
 
-
 module.exports = Server

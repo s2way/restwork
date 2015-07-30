@@ -8,12 +8,12 @@ class FsConnector
     constructor: (params, deps) ->
         @files = deps?.fs || require('waferpie-utils').Files
         @prefix = path.join params.domain, params.resource
-
-    create: (data, callback) ->
         try
             @files.createDirIfNotExists params.domain
         try
             @files.createDirIfNotExists @prefix
+
+    create: (data, callback) ->
 
         id = String(data.id) || "#{order}_#{uuid.v4().substr(-12)}"
         file = path.join @prefix, "#{id}.json"
@@ -26,10 +26,8 @@ class FsConnector
 
     read: (basePath, id, callback) ->
         try
-            fileContents = require path.join(basePath, @prefix, id)
-            callback null, fileContents
+            callback null, require path.join(basePath, @prefix, id)
         catch e
             callback e
-        
 
 module.exports = FsConnector
