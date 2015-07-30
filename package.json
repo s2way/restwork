@@ -26,11 +26,11 @@
     "bunyan": "~1.4.0",
     "node-persist": "0.0.6",
     "node-uuid": "~1.4.3",
-    "restwork-oauth": "git://github.com/Moharu/restwork-oauth.git"
+    "restwork-oauth": "git://github.com/Moharu/restwork-oauth.git",
+    "waferpie-utils": "git://github.com/s2way/waferpie-utils.git"
   },
   "devDependencies": {
     "blanket": "git://github.com/alex-seville/blanket.git",
-    "waferpie-utils": "git@github.com:s2way/waferpie-utils.git",
     "coffee-script": "latest",
     "coffeelint": "^1.9.4",
     "expect.js": "^0.3.1",
