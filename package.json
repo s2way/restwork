@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.coffee",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test coverage"
   },
   "config": {
     "blanket": {
@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "blanket": "git://github.com/alex-seville/blanket.git",
+    "waferpie-utils": "git@github.com:s2way/waferpie-utils.git",
     "coffee-script": "latest",
     "coffeelint": "^1.9.4",
     "expect.js": "^0.3.1",
