@@ -39,12 +39,12 @@ class Server
                 next()
 
     _registerListeners: ->
-        # @server.on 'after', @restify.auditLogger(
-        #     log: @bunyan.createLogger(
-        #         name: 'audit'
-        #         stream: process.stdout
-        #     )
-        # )
+        @server.on 'after', @restify.auditLogger(
+            log: @bunyan.createLogger(
+                name: 'audit'
+                stream: process.stdout
+            )
+        )
         @server.on 'error', (req, res, route, err) ->
             console.log err.stack
         @server.on 'uncaughtException', (req, res, route, err) ->

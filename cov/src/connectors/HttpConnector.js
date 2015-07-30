@@ -17,7 +17,7 @@
       client = this.restify.createStringClient({
         url: params.url
       });
-      path = (params != null ? params.path : void 0) || '/';
+      path = (params != null ? params.path : void 0) || '';
       return client.post(path, params != null ? params.data : void 0, function(err, req, res, data) {
         if (err != null) {
           return callback(err);
