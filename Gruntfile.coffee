@@ -48,5 +48,5 @@ module.exports = (grunt) ->
         grunt.task.run 'watch'
     grunt.registerTask 'lint', ['coffeelint']
     grunt.registerTask 'compile', ['coffee:compile']
-    grunt.registerTask 'test', ['mochaTest:spec']
+    grunt.registerTask 'test', ['mochaTest:progress']
     grunt.registerTask 'coverage', ['exec:cov']
