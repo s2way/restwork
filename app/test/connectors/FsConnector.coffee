@@ -88,7 +88,7 @@ describe 'the fsConnector,', ->
 
             instance = new FsConnector params, fs : NodePersistMock
 
-            instance.read '', '1.json', (err, success) ->
+            instance.read '1.json', (err, success) ->
                 expect(err).to.be.ok()
                 done()
 
