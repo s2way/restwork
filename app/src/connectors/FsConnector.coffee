@@ -24,9 +24,9 @@ class FsConnector
         catch e
             callback e
 
-    read: (basePath, id, callback) ->
+    read: (id, callback) ->
         try
-            callback null, require path.join(basePath, @prefix, id)
+            callback null, require path.join(process.cwd(), @prefix, id)
         catch e
             callback e
 
