@@ -9,9 +9,14 @@ class MySQLConnector
     NOT_FOUND_ERROR = 'NOT_FOUND'
 
     constructor: (params, deps) ->
-        @mysql = deps?.mysql || require 'mysql'
+
         @rules = require('waferpie-utils').Rules
         exceptions = require('waferpie-utils').Exceptions
+
+        if !@rules.isUseful(params)
+            throw new exceptions.Fatal exceptions.INVALID_ARGUMENT, 'Missing arguments'
+        
+        @mysql = deps?.mysql || require 'mysql'
 
         host = params?.host || null
         poolSize = params?.poolSize || null
@@ -56,8 +61,19 @@ class MySQLConnector
     _selectDatabase: (databaseName, connection, callback) ->
         connection.query "USE #{databaseName}", [], callback
 
+    create: (data, callback) ->
+        return callback 'Invalid data' if !@rules.isUseful(data)
+        fields = ''
+        values = []
+        for key, value of data
+            fields += "#{key}=?,"
+            values.push value
+        fields = fields.substr 0,fields.length-1
 
-    # create
+        @_execute "INSERT INTO #{@table} SET #{fields}", values, (err, row) =>
+            return callback err if err?
+            return callback null, row if @rules.isUseful(row)
+
     # createMany
     # readMany
     # update

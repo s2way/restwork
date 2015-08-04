@@ -10,9 +10,12 @@
 
     function MySQLConnector(params, deps) {
       var exceptions, host, password, poolParams, poolSize, timeout, user;
-      this.mysql = (deps != null ? deps.mysql : void 0) || require('mysql');
       this.rules = require('waferpie-utils').Rules;
       exceptions = require('waferpie-utils').Exceptions;
+      if (!this.rules.isUseful(params)) {
+        throw new exceptions.Fatal(exceptions.INVALID_ARGUMENT, 'Missing arguments');
+      }
+      this.mysql = (deps != null ? deps.mysql : void 0) || require('mysql');
       host = (params != null ? params.host : void 0) || null;
       poolSize = (params != null ? params.poolSize : void 0) || null;
       timeout = (params != null ? params.timeout : void 0) || 10000;
@@ -76,6 +79,31 @@
 
     MySQLConnector.prototype._selectDatabase = function(databaseName, connection, callback) {
       return connection.query("USE " + databaseName, [], callback);
+    };
+
+    MySQLConnector.prototype.create = function(data, callback) {
+      var fields, key, value, values;
+      if (!this.rules.isUseful(data)) {
+        return callback('Invalid data');
+      }
+      fields = '';
+      values = [];
+      for (key in data) {
+        value = data[key];
+        fields += key + "=?,";
+        values.push(value);
+      }
+      fields = fields.substr(0, fields.length - 1);
+      return this._execute("INSERT INTO " + this.table + " SET " + fields, values, (function(_this) {
+        return function(err, row) {
+          if (err != null) {
+            return callback(err);
+          }
+          if (_this.rules.isUseful(row)) {
+            return callback(null, row);
+          }
+        };
+      })(this));
     };
 
     return MySQLConnector;

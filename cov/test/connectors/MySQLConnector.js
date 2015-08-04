@@ -15,7 +15,7 @@
         }).to.throwError(function(e) {
           expect(e.type).to.be('Fatal');
           expect(e.name).to.be('Invalid argument');
-          return expect(e.message).to.be('Missing one or more arguments');
+          return expect(e.message).to.be('Missing arguments');
         });
       });
       return it('should verify if the connection pool was created', function() {
@@ -23,7 +23,7 @@
         createPoolCalled = false;
         params = {
           host: 'host',
-          poolSize: 10000,
+          poolSize: 1,
           timeout: 10000,
           user: 'user',
           password: 'password',
@@ -53,13 +53,13 @@
         return expect(createPoolCalled).to.be.ok();
       });
     });
-    return describe('when reading a order', function() {
+    describe('when reading a order', function() {
       var params;
       params = null;
       beforeEach(function() {
         return params = {
           host: 'host',
-          poolSize: 10000,
+          poolSize: 1,
           timeout: 10000,
           user: 'user',
           password: 'password',
@@ -241,6 +241,112 @@
           expect(response).not.to.be.ok();
           return done();
         });
+      });
+    });
+    return describe('when creating an order', function() {
+      var params;
+      params = null;
+      beforeEach(function() {
+        return params = {
+          host: 'host',
+          poolSize: 1,
+          timeout: 10000,
+          user: 'user',
+          password: 'password',
+          domain: 'databaseName',
+          resource: 'tableName'
+        };
+      });
+      it('should return an error if the order data is null', function(done) {
+        var connector, expectedError;
+        expectedError = 'Invalid data';
+        connector = new MySQLConnector(params);
+        return connector.create(null, function(error, response) {
+          expect(error).to.eql(expectedError);
+          expect(response).not.to.be.ok();
+          return done();
+        });
+      });
+      it('should return an error if the order data is undefined', function(done) {
+        var connector, expectedError;
+        expectedError = 'Invalid data';
+        connector = new MySQLConnector(params);
+        return connector.create(void 0, function(error, response) {
+          expect(error).to.eql(expectedError);
+          expect(response).not.to.be.ok();
+          return done();
+        });
+      });
+      it('should return an error if the order data is Empty object', function(done) {
+        var connector, expectedError;
+        expectedError = 'Invalid data';
+        connector = new MySQLConnector(params);
+        return connector.create({}, function(error, response) {
+          expect(error).to.eql(expectedError);
+          expect(response).not.to.be.ok();
+          return done();
+        });
+      });
+      it('should return the query error if it happens', function(done) {
+        var connector, data, expectedError;
+        expectedError = 'Error Query';
+        data = {
+          id: 1
+        };
+        connector = new MySQLConnector(params);
+        connector._execute = function(query, params, callback) {
+          return callback(expectedError);
+        };
+        return connector.create(data, function(error, response) {
+          expect(error).to.eql(expectedError);
+          expect(response).not.to.be.ok();
+          return done();
+        });
+      });
+      it('should return the found rows affected', function(done) {
+        var connector, data, expectedResponse;
+        expectedResponse = 'Rows Affected:1';
+        data = {
+          id: 101,
+          costumer_number: 321321,
+          seq_code_status: 1,
+          description: "Teste recarga",
+          return_url: "www.google.com",
+          amount: 201,
+          payment_type: "credito_a_vista",
+          installments: 1
+        };
+        connector = new MySQLConnector(params);
+        connector._execute = function(query, params, callback) {
+          return callback(null, expectedResponse);
+        };
+        return connector.create(data, function(error, response) {
+          expect(error).not.to.be.ok();
+          expect(response).to.eql(expectedResponse);
+          return done();
+        });
+      });
+      return it('should pass the expected Query and Params', function(done) {
+        var connector, data, expectedParams, expectedQuery;
+        expectedQuery = 'INSERT INTO tableName SET id=?,costumer_number=?,seq_code_status=?,description=?,return_url=?,amount=?,payment_type=?,installments=?';
+        expectedParams = [101, 321321, 1, "Teste recarga", "www.google.com", 201, "credito_a_vista", 1];
+        data = {
+          id: 101,
+          costumer_number: 321321,
+          seq_code_status: 1,
+          description: "Teste recarga",
+          return_url: "www.google.com",
+          amount: 201,
+          payment_type: "credito_a_vista",
+          installments: 1
+        };
+        connector = new MySQLConnector(params);
+        connector._execute = function(query, params, callback) {
+          expect(query).to.eql(expectedQuery);
+          expect(params).to.eql(expectedParams);
+          return done();
+        };
+        return connector.create(data, function() {});
       });
     });
   });
