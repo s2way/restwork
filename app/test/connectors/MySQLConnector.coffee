@@ -17,6 +17,91 @@ describe 'the MySQLConnector,', ->
                 expect(e.message).to.be 'Missing arguments'
             )
 
+        it 'should throw an exception if host is not useful', ->
+            expect(->
+                params =
+                    host: {}
+                    poolSize: 1
+                    timeout: 12
+                    user: 'test'
+                    password: 'test'
+                    domain: 'test'
+                    resource: 'test'
+                new MySQLConnector params
+            ).to.throwError((e) ->
+                expect(e.type).to.be 'Fatal'
+                expect(e.name).to.be 'Invalid argument'
+                expect(e.message).to.be 'Missing one or more arguments'
+            )
+
+        it 'should throw an exception if domain is not useful', ->
+            expect(->
+                params =
+                    host: 'test'
+                    poolSize: 1
+                    timeout: 12
+                    user: 'test'
+                    password: 'test'
+                    domain: {}
+                    resource: 'test'
+                new MySQLConnector params
+            ).to.throwError((e) ->
+                expect(e.type).to.be 'Fatal'
+                expect(e.name).to.be 'Invalid argument'
+                expect(e.message).to.be 'Missing one or more arguments'
+            )
+
+        it 'should throw an exception if resource is not useful', ->
+            expect(->
+                params =
+                    host: 'test'
+                    poolSize: 1
+                    timeout: 12
+                    user: 'test'
+                    password: 'test'
+                    domain: 'test'
+                    resource: {}
+                new MySQLConnector params
+            ).to.throwError((e) ->
+                expect(e.type).to.be 'Fatal'
+                expect(e.name).to.be 'Invalid argument'
+                expect(e.message).to.be 'Missing one or more arguments'
+            )
+
+        it 'should throw an exception if user is not useful', ->
+            expect(->
+                params =
+                    host: 'test'
+                    poolSize: 1
+                    timeout: 12
+                    user: {}
+                    password: 'test'
+                    domain: 'test'
+                    resource: 'test'
+                new MySQLConnector params
+            ).to.throwError((e) ->
+                expect(e.type).to.be 'Fatal'
+                expect(e.name).to.be 'Invalid argument'
+                expect(e.message).to.be 'Missing one or more arguments'
+            )
+
+        it 'should throw an exception if poolSize is not useful', ->
+            expect(->
+                params =
+                    host: 'test'
+                    poolSize: {}
+                    timeout: 12
+                    user: 'test'
+                    password: 'test'
+                    domain: 'test'
+                    resource: 'test'
+                new MySQLConnector params
+            ).to.throwError((e) ->
+                expect(e.type).to.be 'Fatal'
+                expect(e.name).to.be 'Invalid argument'
+                expect(e.message).to.be 'Missing one or more arguments'
+            )
+
         it 'should verify if the connection pool was created', ->
 
             createPoolCalled = false
