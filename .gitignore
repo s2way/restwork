@@ -3,4 +3,4 @@ node_modules/
 coverage.html
 *.floo
 *.flooignore
-cov/
+cov/*
