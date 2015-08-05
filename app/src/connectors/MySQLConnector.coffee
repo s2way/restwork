@@ -70,9 +70,27 @@ class MySQLConnector
             values.push value
         fields = fields.substr 0,fields.length-1
 
-        @_execute "INSERT INTO #{@table} SET #{fields}", values, (err, row) =>
+        @_execute "INSERT INTO #{@table} SET #{fields}", values, (err, row) ->
             return callback err if err?
-            return callback null, row if @rules.isUseful(row)
+            return callback null, row
+
+    update:(id, data, callback) ->
+        return callback 'Invalid id' if !@rules.isUseful(id) or @rules.isZero id
+        return callback 'Invalid data' if !@rules.isUseful(data)
+
+        fields = ''
+        values = []
+
+        for key, value of data
+            fields += "#{key}=?,"
+            values.push value
+
+        fields = fields.substr 0,fields.length-1
+        values.push id
+
+        @_execute "UPDATE #{@table} SET #{fields} WHERE id=?", values, (err, row) ->
+            return callback err if err?
+            return callback null, row
 
     # createMany
     # readMany

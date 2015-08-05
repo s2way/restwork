@@ -18,7 +18,7 @@
           return expect(e.message).to.be('Missing arguments');
         });
       });
-      return it('should verify if the connection pool was created', function() {
+      it('should verify if the connection pool was created', function() {
         var connector, createPoolCalled, deps, expectedParams, params;
         createPoolCalled = false;
         params = {
@@ -51,6 +51,24 @@
         expect(connector).to.be.ok();
         expect(connector.pool).to.be.ok();
         return expect(createPoolCalled).to.be.ok();
+      });
+      return it('should', function() {
+        var params;
+        params = {
+          poolSize: 1,
+          timeout: 10000,
+          user: 'user',
+          password: 'password',
+          domain: 'databaseName',
+          resource: 'tableName'
+        };
+        return expect(function() {
+          return new MySQLConnector(params);
+        }).to.throwError(function(e) {
+          expect(e.type).to.be('Fatal');
+          expect(e.name).to.be('Invalid argument');
+          return expect(e.message).to.be('Missing one or more arguments');
+        });
       });
     });
     describe('when reading a order', function() {
@@ -243,7 +261,7 @@
         });
       });
     });
-    return describe('when creating an order', function() {
+    describe('when creating an order', function() {
       var params;
       params = null;
       beforeEach(function() {
@@ -347,6 +365,135 @@
           return done();
         };
         return connector.create(data, function() {});
+      });
+    });
+    return describe('when updating an order', function() {
+      var params;
+      params = null;
+      beforeEach(function() {
+        return params = {
+          host: 'host',
+          poolSize: 1,
+          timeout: 10000,
+          user: 'user',
+          password: 'password',
+          domain: 'databaseName',
+          resource: 'tableName'
+        };
+      });
+      it('deve receber um erro se o id for undefined', function(done) {
+        var connector, expectedError;
+        expectedError = 'Invalid id';
+        connector = new MySQLConnector(params);
+        return connector.update(void 0, null, function(error, response) {
+          expect(error).to.eql(expectedError);
+          expect(response).not.to.be.ok();
+          return done();
+        });
+      });
+      it('deve receber um erro se o id for null', function(done) {
+        var connector, expectedError;
+        expectedError = 'Invalid id';
+        connector = new MySQLConnector(params);
+        return connector.update(null, null, function(error, response) {
+          expect(error).to.eql(expectedError);
+          expect(response).not.to.be.ok();
+          return done();
+        });
+      });
+      it('deve receber um erro se o id for zero', function(done) {
+        var connector, expectedError;
+        expectedError = 'Invalid id';
+        connector = new MySQLConnector(params);
+        return connector.update(0, null, function(error, response) {
+          expect(error).to.eql(expectedError);
+          expect(response).not.to.be.ok();
+          return done();
+        });
+      });
+      it('deve receber um erro se o data for undefined', function(done) {
+        var connector, expectedError;
+        expectedError = 'Invalid data';
+        connector = new MySQLConnector(params);
+        return connector.update('1', void 0, function(error, response) {
+          expect(error).to.eql(expectedError);
+          expect(response).not.to.be.ok();
+          return done();
+        });
+      });
+      it('deve receber um erro se o data for null', function(done) {
+        var connector, expectedError;
+        expectedError = 'Invalid data';
+        connector = new MySQLConnector(params);
+        return connector.update('1', null, function(error, response) {
+          expect(error).to.eql(expectedError);
+          expect(response).not.to.be.ok();
+          return done();
+        });
+      });
+      it('deve receber um erro se o data for vazio', function(done) {
+        var connector, expectedError;
+        expectedError = 'Invalid data';
+        connector = new MySQLConnector(params);
+        return connector.update('1', {}, function(error, response) {
+          expect(error).to.eql(expectedError);
+          expect(response).not.to.be.ok();
+          return done();
+        });
+      });
+      it('deve receber um erro se acontecer algum erro ao efetuar um update', function(done) {
+        var connector, data, expectedError;
+        expectedError = 'Error Query';
+        data = {
+          id: 1
+        };
+        connector = new MySQLConnector(params);
+        connector._execute = function(query, params, callback) {
+          return callback(expectedError);
+        };
+        return connector.update(1, data, function(error, response) {
+          expect(error).to.eql(expectedError);
+          expect(response).not.to.be.ok();
+          return done();
+        });
+      });
+      it('should pass the expected Query and Params', function(done) {
+        var connector, data, expectedParams, expectedQuery, id;
+        id = '12345678901234567890';
+        data = {
+          issuer: "visa",
+          payment_type: "credito_a_vista",
+          installments: 1
+        };
+        expectedQuery = 'UPDATE tableName SET issuer=?,payment_type=?,installments=? WHERE id=?';
+        expectedParams = [data.issuer, data.payment_type, data.installments, id];
+        connector = new MySQLConnector(params);
+        connector._execute = function(query, params, callback) {
+          expect(query).to.eql(expectedQuery);
+          expect(params).to.eql(expectedParams);
+          return done();
+        };
+        return connector.update(id, data, function() {});
+      });
+      return it('deve retornar sucesso se não ocorreu nenhum erro', function(done) {
+        var connector, data, expectedRow;
+        data = {
+          issuer: "visa",
+          payment_type: "credito_a_vista",
+          installments: 1
+        };
+        connector = new MySQLConnector(params);
+        expectedRow = {
+          affected_rows: 1
+        };
+        connector._execute = function(query, params, callback) {
+          return callback(null, expectedRow);
+        };
+        return connector.update('123', data, function(err, row) {
+          expect(err).not.to.be.ok();
+          expect(row).to.be.eql(expectedRow);
+          return done();
+        });
       });
     });
   });

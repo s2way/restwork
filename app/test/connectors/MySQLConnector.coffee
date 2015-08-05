@@ -50,6 +50,24 @@ describe 'the MySQLConnector,', ->
             expect(connector.pool).to.be.ok()
             expect(createPoolCalled).to.be.ok()
 
+        it 'should', ->
+
+            params =
+                poolSize : 1
+                timeout : 10000
+                user: 'user'
+                password: 'password'
+                domain: 'databaseName'
+                resource: 'tableName'
+
+            expect(->
+                new MySQLConnector params
+            ).to.throwError((e) ->
+                expect(e.type).to.be 'Fatal'
+                expect(e.name).to.be 'Invalid argument'
+                expect(e.message).to.be 'Missing one or more arguments'
+            )
+
     describe 'when reading a order', ->
 
         params = null
@@ -333,3 +351,134 @@ describe 'the MySQLConnector,', ->
                 done()
 
             connector.create data, ->
+
+    describe 'when updating an order', ->
+        params = null
+
+        beforeEach ->
+
+            params =
+                host : 'host'
+                poolSize : 1
+                timeout : 10000
+                user: 'user'
+                password: 'password'
+                domain: 'databaseName'
+                resource: 'tableName'
+
+        it 'deve receber um erro se o id for undefined', (done) ->
+            expectedError = 'Invalid id'
+
+            connector = new MySQLConnector params
+            connector.update undefined, null, (error, response) ->
+                expect(error).to.eql expectedError
+                expect(response).not.to.be.ok()
+                done()
+
+        it 'deve receber um erro se o id for null', (done) ->
+            expectedError = 'Invalid id'
+
+            connector = new MySQLConnector params
+            connector.update null, null, (error, response) ->
+                expect(error).to.eql expectedError
+                expect(response).not.to.be.ok()
+                done()
+
+        it 'deve receber um erro se o id for zero', (done) ->
+            expectedError = 'Invalid id'
+
+            connector = new MySQLConnector params
+            connector.update 0, null, (error, response) ->
+                expect(error).to.eql expectedError
+                expect(response).not.to.be.ok()
+                done()
+
+        it 'deve receber um erro se o data for undefined', (done) ->
+            expectedError = 'Invalid data'
+
+            connector = new MySQLConnector params
+            connector.update '1', undefined, (error, response) ->
+                expect(error).to.eql expectedError
+                expect(response).not.to.be.ok()
+                done()
+
+        it 'deve receber um erro se o data for null', (done) ->
+            expectedError = 'Invalid data'
+
+            connector = new MySQLConnector params
+            connector.update '1', null, (error, response) ->
+                expect(error).to.eql expectedError
+                expect(response).not.to.be.ok()
+                done()
+
+        it 'deve receber um erro se o data for vazio', (done) ->
+            expectedError = 'Invalid data'
+
+            connector = new MySQLConnector params
+            connector.update '1', {}, (error, response) ->
+                expect(error).to.eql expectedError
+                expect(response).not.to.be.ok()
+                done()
+        
+        it 'deve receber um erro se acontecer algum erro ao efetuar um update', (done) ->
+            expectedError = 'Error Query'
+
+            data =
+                id:1
+
+            connector = new MySQLConnector params
+
+            connector._execute = (query, params, callback)->
+                callback expectedError
+
+            connector.update 1,data, (error, response) ->
+                expect(error).to.eql expectedError
+                expect(response).not.to.be.ok()
+                done()
+
+        it 'should pass the expected Query and Params', (done) ->
+
+            id = '12345678901234567890'
+
+            data =
+               issuer: "visa"
+               payment_type: "credito_a_vista"
+               installments: 1
+
+            expectedQuery = 'UPDATE tableName SET issuer=?,payment_type=?,installments=? WHERE id=?'
+
+            expectedParams = [
+                data.issuer,
+                data.payment_type,
+                data.installments,
+                id
+            ]
+
+            connector = new MySQLConnector params
+
+            connector._execute = (query, params, callback)->
+                expect(query).to.eql expectedQuery
+                expect(params).to.eql expectedParams
+                done()
+
+            connector.update id, data, ->
+
+        it 'deve retornar sucesso se não ocorreu nenhum erro', (done) ->
+
+            data =
+               issuer: "visa"
+               payment_type: "credito_a_vista"
+               installments: 1
+
+            connector = new MySQLConnector params
+
+            expectedRow =
+                affected_rows: 1
+
+            connector._execute = (query, params, callback)->
+                callback null, expectedRow
+
+            connector.update '123', data, (err, row) ->
+                expect(err).not.to.be.ok()
+                expect(row).to.be.eql expectedRow
+                done()

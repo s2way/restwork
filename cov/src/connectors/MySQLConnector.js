@@ -94,16 +94,37 @@
         values.push(value);
       }
       fields = fields.substr(0, fields.length - 1);
-      return this._execute("INSERT INTO " + this.table + " SET " + fields, values, (function(_this) {
-        return function(err, row) {
-          if (err != null) {
-            return callback(err);
-          }
-          if (_this.rules.isUseful(row)) {
-            return callback(null, row);
-          }
-        };
-      })(this));
+      return this._execute("INSERT INTO " + this.table + " SET " + fields, values, function(err, row) {
+        if (err != null) {
+          return callback(err);
+        }
+        return callback(null, row);
+      });
+    };
+
+    MySQLConnector.prototype.update = function(id, data, callback) {
+      var fields, key, value, values;
+      if (!this.rules.isUseful(id) || this.rules.isZero(id)) {
+        return callback('Invalid id');
+      }
+      if (!this.rules.isUseful(data)) {
+        return callback('Invalid data');
+      }
+      fields = '';
+      values = [];
+      for (key in data) {
+        value = data[key];
+        fields += key + "=?,";
+        values.push(value);
+      }
+      fields = fields.substr(0, fields.length - 1);
+      values.push(id);
+      return this._execute("UPDATE " + this.table + " SET " + fields + " WHERE id=?", values, function(err, row) {
+        if (err != null) {
+          return callback(err);
+        }
+        return callback(null, row);
+      });
     };
 
     return MySQLConnector;
