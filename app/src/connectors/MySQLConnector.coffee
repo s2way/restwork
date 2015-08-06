@@ -47,6 +47,35 @@ class MySQLConnector
             return callback null, row if @rules.isUseful(row)
             return callback NOT_FOUND_ERROR
 
+    readJoin: (id, params, callback) ->
+        return callback 'Invalid id' if !@rules.isUseful(id) or @rules.isZero id
+
+        joinTable = params?.table || null
+        condition = params?.condition || null
+        fields = params?.fields || null
+
+        if !@rules.isUseful(joinTable) or !@rules.isUseful(condition) or !@rules.isUseful(fields)
+            return callback 'Invalid join parameters'
+
+        if params?.orderBy
+            orderBy =  "ORDER BY #{params.orderBy}"
+        if params?.limit
+            limit = "LIMIT #{params.limit}"
+
+        selectFields = ''
+
+        for key in fields
+            selectFields += "#{key},"
+
+        selectFields = selectFields.substring(0, selectFields.length-1)
+
+        query = "SELECT #{selectFields} FROM #{@table} JOIN #{joinTable} ON #{condition} WHERE #{@table}.id = ? #{orderBy} #{limit}"
+
+        @_execute query, [id], (err, row) =>
+            return callback err if err?
+            return callback null, row if @rules.isUseful(row)
+            return callback NOT_FOUND_ERROR
+
     _execute: (query, params, callback) ->
         @pool.getConnection (err, connection) =>
             return callback 'Error getConnection' if err?
@@ -70,9 +99,9 @@ class MySQLConnector
             values.push value
         fields = fields.substr 0,fields.length-1
 
-        @_execute "INSERT INTO #{@table} SET #{fields}", values, (err, row) ->
+        @_execute "INSERT INTO #{@table} SET #{fields}", values, (err) ->
             return callback err if err?
-            return callback null, row
+            return callback()
 
     update:(id, data, callback) ->
         return callback 'Invalid id' if !@rules.isUseful(id) or @rules.isZero id
@@ -91,6 +120,10 @@ class MySQLConnector
         @_execute "UPDATE #{@table} SET #{fields} WHERE id=?", values, (err, row) ->
             return callback err if err?
             return callback null, row
+
+    changeTable: (tableName) ->
+        @table = tableName
+        
 
     # createMany
     # readMany

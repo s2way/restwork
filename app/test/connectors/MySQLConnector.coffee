@@ -316,7 +316,127 @@ describe 'the MySQLConnector,', ->
                 expect(response).not.to.be.ok()
                 done()
 
-     describe 'when creating an order', ->
+    describe 'when reading a order with join', ->
+
+        mysqlParams = null
+        joinParams = null
+
+        beforeEach ->
+            mysqlParams =
+                host : 'host'
+                poolSize : 1
+                timeout : 10000
+                user: 'user'
+                password: 'password'
+                domain: 'databaseName'
+                resource: 'table1'
+
+            joinParams =
+                table: 'table2'
+                condition: 'table1.id = table2.table1_id'
+                fields: ['field1','field2']
+
+        it 'should return an error if the order id is null', (done) ->
+
+            expectedError = 'Invalid id'
+
+            connector = new MySQLConnector mysqlParams
+            connector.readJoin null, null, (error, response) ->
+                expect(error).to.eql expectedError
+                expect(response).not.to.be.ok()
+                done()
+
+        it 'should return an error if the join table is null', (done) ->
+
+            expectedError = 'Invalid join parameters'
+
+            delete joinParams.table
+
+            connector = new MySQLConnector mysqlParams
+            connector.readJoin '123465789', joinParams, (error, response) ->
+                expect(error).to.eql expectedError
+                expect(response).not.to.be.ok()
+                done()
+
+        it 'should return an error if the join condition is null', (done) ->
+
+            expectedError = 'Invalid join parameters'
+
+            delete joinParams.condition
+
+            connector = new MySQLConnector mysqlParams
+            connector.readJoin '123465789', joinParams, (error, response) ->
+                expect(error).to.eql expectedError
+                expect(response).not.to.be.ok()
+                done()
+
+        it 'should return an error if the join fields is null', (done) ->
+
+            expectedError = 'Invalid join parameters'
+
+            delete joinParams.fields
+
+            connector = new MySQLConnector mysqlParams
+            connector.readJoin '123465789', joinParams, (error, response) ->
+                expect(error).to.eql expectedError
+                expect(response).not.to.be.ok()
+                done()
+
+        it 'should return an error when executing a query', (done) ->
+
+            expectedError = 'Internal error'
+
+            connector = new MySQLConnector mysqlParams
+            connector._execute = (query, params, callback) ->
+                callback expectedError
+            connector.readJoin '123456789', joinParams, (error, response) ->
+                expect(error).to.eql expectedError
+                expect(response).not.to.be.ok()
+                done()
+
+        it 'should return a row if was found', (done) ->
+
+            expectedResponse =
+                id: '123456789'
+                something: 'something'
+
+            connector = new MySQLConnector mysqlParams
+            connector._execute = (query, params, callback) ->
+                callback null, expectedResponse
+            connector.readJoin '123456789', joinParams, (error, response) ->
+                expect(error).not.to.be.ok()
+                expect(response).to.eql expectedResponse
+                done()
+
+        it 'should return an error if the result was not found', (done) ->
+
+            expectedError = 'NOT_FOUND'
+
+            connector = new MySQLConnector mysqlParams
+            connector._execute = (query, params, callback) ->
+                callback()
+            connector.readJoin '123456789', joinParams, (error, response) ->
+                expect(error).to.eql expectedError
+                expect(response).not.to.be.ok()
+                done()
+
+        it 'should validate a final query with all params possibilities', (done) ->
+
+            expectedQuery = "SELECT field1,field2 FROM table1 JOIN table2 ON table1.id = table2.table1_id WHERE table1.id = ? ORDER BY orderField DESC LIMIT 15"
+            expectedParams = [123456789]
+
+            joinParams.orderBy = 'orderField DESC'
+            joinParams.limit = 15
+
+
+            connector = new MySQLConnector mysqlParams
+            connector._execute = (query, params, callback) ->
+                expect(query).to.eql expectedQuery
+                expect(params).to.eql expectedParams
+                done()
+            connector.readJoin '123456789', joinParams, ->
+
+    describe 'when creating an order', ->
 
         params = null
 
@@ -381,8 +501,6 @@ describe 'the MySQLConnector,', ->
 
         it 'should return the found rows affected', (done) ->
 
-            expectedResponse = 'Rows Affected:1'
-
             data =
                id : 101
                costumer_number: 321321
@@ -396,11 +514,11 @@ describe 'the MySQLConnector,', ->
             connector = new MySQLConnector params
 
             connector._execute = (query, params, callback)->
-                callback null, expectedResponse
+                callback()
 
             connector.create data, (error, response) ->
                 expect(error).not.to.be.ok()
-                expect(response).to.eql expectedResponse
+                expect(response).not.to.be.ok()
                 done()
 
         it 'should pass the expected Query and Params', (done) ->
@@ -567,3 +685,20 @@ describe 'the MySQLConnector,', ->
                 expect(err).not.to.be.ok()
                 expect(row).to.be.eql expectedRow
                 done()
+
+    describe 'when changing a tableName', ->
+
+        it 'deve validar se o nome da tabela foi alterada corretamente', ->
+
+            params=
+                host : 'host'
+                poolSize : 1
+                timeout : 10000
+                user: 'user'
+                password: 'password'
+                domain: 'databaseName'
+                resource: 'firstTableName'
+
+            connector = new MySQLConnector params
+            connector.changeTable 'secondTableName'
+            expect(connector.table).to.eql 'secondTableName'
