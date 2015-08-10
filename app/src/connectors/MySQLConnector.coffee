@@ -40,9 +40,15 @@ class MySQLConnector
 
         @pool = @mysql.createPool poolParams
 
-    read: (id, callback) ->
+    readById: (id, callback) ->
         return callback 'Invalid id' if !@rules.isUseful(id) or @rules.isZero id
         @_execute "SELECT * FROM #{@table} WHERE id = ?", [id], (err, row) =>
+            return callback err if err?
+            return callback null, row if @rules.isUseful(row)
+            return callback NOT_FOUND_ERROR
+
+    read: (query, callback) ->
+        @_execute query, null, (err, row) =>
             return callback err if err?
             return callback null, row if @rules.isUseful(row)
             return callback NOT_FOUND_ERROR
@@ -123,7 +129,6 @@ class MySQLConnector
 
     changeTable: (tableName) ->
         @table = tableName
-        
 
     # createMany
     # readMany
