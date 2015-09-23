@@ -65,7 +65,6 @@ describe 'The Server', ->
             expect(receivedPort).to.eql expectedPort
             expect(receivedCallback).to.eql expectedCallback
 
-
     describe '_loadRoutes method', ->
 
         instance = null
@@ -128,6 +127,7 @@ describe 'The Server', ->
                 use : (methodName) ->
                     methodsCalled.push methodName
             instance.restify =
+                CORS: ->
                 authorizationParser : ->
                     'authorizationParser'
                 bodyParser : ->
@@ -157,6 +157,8 @@ describe 'The Server', ->
                     methodName(null, res, ->)
                     methodsCalled.push methodName.toString()
             instance.restify =
+                CORS: ->
+                    CORS = ->
                 authorizationParser : ->
                     authorizationParser = ->
                 bodyParser : ->
