@@ -47,8 +47,8 @@ class Server
             )
         )
         @server.on 'error', (req, res, route, err) ->
-            console.log err.stack
+            console.log err?.stack || err
         @server.on 'uncaughtException', (req, res, route, err) ->
-            console.log err.stack
+            console.log err?.stack || err
 
 module.exports = Server
