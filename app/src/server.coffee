@@ -29,12 +29,7 @@ class Server
         @server.use @restify.bodyParser(mapParams: false) if @handlers?.bodyParser?
         @server.use @restify.queryParser(mapParams: false) if @handlers?.queryParser?
         if @handlers?.easyOauth?.enable
-            params =
-                secret: @handlers.easyOauth.secret
-                clients: @handlers.easyOauth.clients
-                endpoint: @handlers.easyOauth.endpoint
-                tokenValidity: @handlers.easyOauth.expiry
-            @oauth.easyOauth @server, params
+            @oauth.easyOauth @server, @handlers.easyOauth
             @server.use (req, res, next) ->
                 res.sendUnauthenticated() unless req?.username?
                 next()
