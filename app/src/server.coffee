@@ -31,7 +31,7 @@ class Server
         if @handlers?.easyOauth?.enable
             @oauth.easyOauth @server, @handlers.easyOauth
             @server.use (req, res, next) ->
-                res.sendUnauthenticated() unless req?.username?
+                return res.sendUnauthenticated() unless req?.username?
                 next()
 
     _registerListeners: ->

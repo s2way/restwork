@@ -155,6 +155,7 @@ describe 'The Server', ->
             instance.server =
                 use : (methodName) ->
                     methodName(null, res, ->)
+                    methodName(username: 'test', res, ->)
                     methodsCalled.push methodName.toString()
             instance.restify =
                 CORS: ->
@@ -174,7 +175,7 @@ describe 'The Server', ->
                     secret : 'secret'
                     clients : 'clients'
                     endpoint:  'endpoint'
-                    expiry: 'expiry'
+                    tokenValidity: 'expiry'
             instance.oauth =
                 easyOauth : (server, params)->
                     actualParams = params
