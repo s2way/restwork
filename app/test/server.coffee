@@ -134,7 +134,9 @@ describe 'The Server', ->
                     'bodyParser'
                 queryParser : ->
                     'queryParser'
+            instance.restify.CORS.ALLOW_HEADERS = []
             instance.handlers =
+                cors: true
                 authorizationParser : true
                 bodyParser : true
                 queryParser : true
