@@ -24,7 +24,9 @@ class Server
 
     #TODO: Enable the use of configured general handlers (restify .use)
     _loadGeneralHandlers: ->
-        @server.use @restify.CORS()
+        if @handlers?.cors?
+            @restify.CORS.ALLOW_HEADERS.push 'authorization'
+            @server.use @restify.CORS()
         @server.use @restify.authorizationParser() if @handlers?.authorizationParser?
         @server.use @restify.bodyParser(mapParams: false) if @handlers?.bodyParser?
         @server.use @restify.queryParser(mapParams: false) if @handlers?.queryParser?
