@@ -1,5 +1,7 @@
 'use strict'
 
+fs = require 'fs'
+
 class Server
 
     constructor: (@routes, @handlers, deps) ->
@@ -14,8 +16,27 @@ class Server
         @_registerListeners()
         @server.listen port, startCallback
 
+    setCertificatePath: (certificatePath) ->
+        @_certificatePath = certificatePath
+
     _createServer: ->
+        if @_certificatePath
+
+            ssl_certificate_path = @_certificatePath.certificate
+            ssl_key_path = @_certificatePath.key
+
+            console.log '---------------------------------------'
+            console.log "CERTIFICATE PATH #{ssl_certificate_path}"
+            console.log "KEY PATH         #{ssl_key_path}"
+            console.log '---------------------------------------'
+
+            if ssl_certificate_path? and ssl_key_path?
+                return @restify.createServer({
+                    certificate: fs.readFileSync "#{ssl_certificate_path}",
+                    key: fs.readFileSync "#{ssl_key_path}"
+                })
         return @restify.createServer()
+
 
     _loadRoutes: (routes) ->
         for key, resource of routes
@@ -47,5 +68,7 @@ class Server
             console.log err?.stack || err
         @server.on 'uncaughtException', (req, res, route, err) ->
             console.log err?.stack || err
+
+    
 
 module.exports = Server
