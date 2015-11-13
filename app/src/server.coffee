@@ -16,27 +16,13 @@ class Server
         @_registerListeners()
         @server.listen port, startCallback
 
-    setCertificatePath: (certificatePath) ->
-        @_certificatePath = certificatePath
-
     _createServer: ->
-        if @_certificatePath
-
-            ssl_certificate_path = @_certificatePath.certificate
-            ssl_key_path = @_certificatePath.key
-
-            console.log '---------------------------------------'
-            console.log "CERTIFICATE PATH #{ssl_certificate_path}"
-            console.log "KEY PATH         #{ssl_key_path}"
-            console.log '---------------------------------------'
-
-            if ssl_certificate_path? and ssl_key_path?
-                return @restify.createServer({
-                    certificate: fs.readFileSync "#{ssl_certificate_path}",
-                    key: fs.readFileSync "#{ssl_key_path}"
-                })
+        if @_ssl_certificate? and @_ssl_key?
+            return @restify.createServer({
+                certificate: fs.readFileSync "#{@_ssl_certificate}",
+                key: fs.readFileSync "#{@_ssl_key}"
+            })
         return @restify.createServer()
-
 
     _loadRoutes: (routes) ->
         for key, resource of routes
@@ -69,6 +55,10 @@ class Server
         @server.on 'uncaughtException', (req, res, route, err) ->
             console.log err?.stack || err
 
-    
+    ssl_certificate: (certificateFile) ->
+        @_ssl_certificate = certificateFile
+
+    ssl_key: (keyFile) ->
+        @_ssl_key = keyFile
 
 module.exports = Server
