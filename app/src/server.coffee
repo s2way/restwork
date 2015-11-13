@@ -19,8 +19,8 @@ class Server
     _createServer: ->
         if @_ssl_certificate? and @_ssl_key?
             return @restify.createServer({
-                certificate: fs.readFileSync "#{@_ssl_certificate}",
-                key: fs.readFileSync "#{@_ssl_key}"
+                certificate: @_ssl_certificate,
+                key: @_ssl_key
             })
         return @restify.createServer()
 
