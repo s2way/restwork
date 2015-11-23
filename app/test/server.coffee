@@ -65,6 +65,30 @@ describe 'The Server', ->
             expect(receivedPort).to.eql expectedPort
             expect(receivedCallback).to.eql expectedCallback
 
+        it 'should create restify server with ssl certificate', (done)->
+
+            expectedSSL =
+                certificate: 'MockSSLCertificate'
+                key: 'MockSSLKey'
+
+            expectedPort = 30000
+
+            instance._ssl_certificate = expectedSSL.certificate
+            instance._ssl_key = expectedSSL.key
+            instance._loadGeneralHandlers = ->
+            instance._loadRoutes = (routes)->
+            instance._registerListeners = ->
+
+            instance.restify =
+                createServer: (sslFiles) ->
+                    expect(sslFiles).to.eql expectedSSL
+                    server =
+                        listen: (port, callback) ->
+                            expect(port).to.eql expectedPort
+                            done()
+
+            instance.start expectedPort, ->
+
     describe '_loadRoutes method', ->
 
         instance = null
@@ -217,3 +241,23 @@ describe 'The Server', ->
             expect(methodsCalled).to.contain 'after'
             expect(methodsCalled).to.contain 'error'
             expect(methodsCalled).to.contain 'uncaughtException'
+
+    describe 'ssl_certificate method', ->
+
+        it 'should set the correct certificateFile', ->
+
+            expectedSSLCertificate = 'MockFile'
+
+            instance = new Server
+            instance.ssl_certificate expectedSSLCertificate
+            expect(instance._ssl_certificate).to.eql expectedSSLCertificate
+
+    describe 'ssl_key method', ->
+
+        it 'should set the correct keyFile', ->
+
+            expectedSSLKey = 'MockKeyFile'
+
+            instance = new Server
+            instance.ssl_key expectedSSLKey
+            expect(instance._ssl_key).to.eql expectedSSLKey
