@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.coffee",
   "scripts": {
-    "test": "grunt test coverage"
+    "test": "node_modules/.bin/grunt test coverage"
   },
   "config": {
     "blanket": {
