@@ -26,7 +26,6 @@
     "bunyan": "~1.4.0",
     "node-persist": "0.0.6",
     "restwork-oauth": "git://github.com/Moharu/restwork-oauth.git",
-    "waferpie-utils": "git://github.com/s2way/waferpie-utils.git",
     "mysql": "~2.8.0",
     "node-uuid": "~1.4.3"
   },
