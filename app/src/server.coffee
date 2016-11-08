@@ -1,5 +1,5 @@
 'use strict'
-
+uuid = require 'node-uuid'
 fs = require 'fs'
 
 class Server
@@ -22,7 +22,12 @@ class Server
                 certificate: @_ssl_certificate,
                 key: @_ssl_key
             })
-        return @restify.createServer()
+        server = @restify.createServer()
+        server.use (req, resp, next) ->
+            req.id = uuid.v4()
+            console.log "#{new Date().toISOString()} - REQUEST  # #{req.id} :: method: #{req.route?.method}, path: #{req._url?.path}"
+            next()
+        server
 
     _loadRoutes: (routes) ->
         for key, resource of routes
@@ -44,6 +49,8 @@ class Server
                 next()
 
     _registerListeners: ->
+        @server.on 'after', (req, res, route, error) ->
+            console.log "#{new Date().toISOString()} - RESPONSE # #{req.id} :: method: #{req.route.method}, path: #{req._url.path}"
         @server.on 'error', (req, res, route, err) ->
             console.log err?.stack || err
         @server.on 'uncaughtException', (req, res, route, err) ->
