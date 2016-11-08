@@ -99,7 +99,7 @@ describe 'The Server', ->
         it 'should call server[method] with the right url according to the routes', ->
             receivedPutCalled = false
             receivedGetCalled = false
-            
+
             routes =
                 resource1: [
                     {
@@ -171,7 +171,7 @@ describe 'The Server', ->
             expect(methodsCalled).to.contain 'queryParser'
 
 
-         it 'should add handlers to the server', ->
+        it 'should add handlers to the server', ->
 
             methodsCalled = []
             actualParams = null
@@ -238,7 +238,6 @@ describe 'The Server', ->
             instance._log = ->
 
             instance._registerListeners()
-            expect(methodsCalled).to.contain 'after'
             expect(methodsCalled).to.contain 'error'
             expect(methodsCalled).to.contain 'uncaughtException'
 
