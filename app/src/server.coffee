@@ -50,7 +50,7 @@ class Server
 
     _registerListeners: ->
         @server.on 'after', (req, res, route, error) ->
-            console.log "#{new Date().toISOString()} - RESPONSE # #{req.id} :: method: #{req.route?.method}, path: #{req._url?.path}"
+            console.log "#{new Date().toISOString()} - RESPONSE # #{req.id} :: method: #{req.route?.method}, path: #{req._url?.path}, status: #{res.statusCode}"
         @server.on 'error', (req, res, route, err) ->
             console.log err?.stack || err
         @server.on 'uncaughtException', (req, res, route, err) ->
