@@ -63,8 +63,6 @@ class Server
         @server.on 'uncaughtException', (req, res, route, err) ->
             console.log err?.stack or err
         @server.on 'connection', (conn) =>
-            # timeout after of inactivity (in ms)
-            conn?.setTimeout @connTimeout
             key = "#{conn?.remoteAddress}:#{conn?.remotePort}"
             @activeConnections[key] = conn
             conn?.on 'close', => delete @activeConnections[key]
