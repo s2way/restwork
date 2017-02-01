@@ -1,20 +1,27 @@
-'use strict'
 uuid = require 'node-uuid'
-fs = require 'fs'
 
 class Server
 
     constructor: (@routes, @handlers, deps) ->
-        @restify = deps?.restify || require 'restify'
-        @bunyan = deps?.bunyan || require 'bunyan'
-        @oauth = deps?.oauth || require 'restwork-oauth'
+        @restify = deps?.restify or require 'restify'
+        @bunyan = deps?.bunyan or require 'bunyan'
+        @oauth = deps?.oauth or require 'restwork-oauth'
+        @activeConnections = {}
 
-    start: (port, startCallback) ->
+    start: (port, startCallback, @connTimeout = 30000) ->
         @server = @_createServer()
         @_loadGeneralHandlers()
         @_loadRoutes @routes
         @_registerListeners()
         @server.listen port, startCallback
+
+    close: (cb) ->
+        # give some time to connections to end for themselves
+        connDestroy = setTimeout =>
+            # ... otherwise, destroy'em
+            conn.destroy() for key, conn of @activeConnections
+        , @connTimeout
+        @server.close cb
 
     _createServer: ->
         if @_ssl_certificate? and @_ssl_key?
@@ -50,11 +57,17 @@ class Server
 
     _registerListeners: ->
         @server.on 'after', (req, res, route, error) ->
-            console.log "#{new Date().toISOString()} - RESPONSE # #{req.id} :: method: #{req.route?.method}, path: #{req._url?.path}, status: #{res.statusCode}"
+            console.log "#{new Date().toISOString()} - RESPONSE # #{req?.id} :: method: #{req?.route?.method}, path: #{req?._url?.path}, status: #{res?.statusCode}"
         @server.on 'error', (req, res, route, err) ->
-            console.log err?.stack || err
+            console.log err?.stack or err
         @server.on 'uncaughtException', (req, res, route, err) ->
-            console.log err?.stack || err
+            console.log err?.stack or err
+        @server.on 'connection', (conn) =>
+            # timeout after of inactivity (in ms)
+            conn?.setTimeout @connTimeout
+            key = "#{conn?.remoteAddress}:#{conn?.remotePort}"
+            @activeConnections[key] = conn
+            conn?.on 'close', => delete @activeConnections[key]
 
     ssl_certificate: (certificateFile) ->
         @_ssl_certificate = certificateFile

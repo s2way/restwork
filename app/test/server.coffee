@@ -15,9 +15,10 @@ describe 'The Server', ->
             instance = new Server
             instance.routes = null
             instance.restify =
-                createServer: () ->
+                createServer: ->
                     server =
-                        listen: () ->
+                        listen: ->
+                        use: ->
             instance._loadGeneralHandlers = () ->
             instance._loadRoutes = () ->
 
@@ -25,10 +26,11 @@ describe 'The Server', ->
 
             restifyServerInstanceCreated = false
             instance.restify =
-                createServer: () ->
+                createServer: ->
                     restifyServerInstanceCreated = true
                     server =
-                        listen: () ->
+                        listen: ->
+                        use: ->
             instance._registerListeners = () ->
 
             instance.start()
@@ -54,11 +56,12 @@ describe 'The Server', ->
             receivedCallback = null
 
             instance.restify =
-                createServer: () ->
+                createServer: ->
                     server =
                         listen: (port, callback) ->
                             receivedPort = port
                             receivedCallback = callback
+                        use: ->
             instance._registerListeners = () ->
 
             instance.start expectedPort, expectedCallback
@@ -227,7 +230,7 @@ describe 'The Server', ->
             methodsCalled = []
 
             instance.server =
-                on:(event, method) ->
+                on: (event, method) ->
                     methodsCalled.push event
                     method null, null, null, stack: 'stack'
             instance.restify =
@@ -240,6 +243,8 @@ describe 'The Server', ->
             instance._registerListeners()
             expect(methodsCalled).to.contain 'error'
             expect(methodsCalled).to.contain 'uncaughtException'
+            expect(methodsCalled).to.contain 'after'
+            expect(methodsCalled).to.contain 'connection'
 
     describe 'ssl_certificate method', ->
 
