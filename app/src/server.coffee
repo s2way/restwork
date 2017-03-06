@@ -1,4 +1,5 @@
 uuid = require 'node-uuid'
+_ = require 'lodash'
 
 class Server
 
@@ -57,7 +58,8 @@ class Server
 
     _registerListeners: ->
         @server.on 'after', (req, res, route, error) ->
-            console.log "#{new Date().toISOString()} - RESPONSE # #{req?.id} :: method: #{req?.route?.method}, path: #{req?._url?.path}, status: #{res?.statusCode}"
+            reqId = if _.isFunction(req?.id) then req?.id() else req?.id
+            console.log "#{new Date().toISOString()} - RESPONSE # #{reqId} :: method: #{req?.route?.method}, path: #{req?._url?.path}, status: #{res?.statusCode}"
         @server.on 'error', (req, res, route, err) ->
             console.log err?.stack or err
         @server.on 'uncaughtException', (req, res, route, err) ->
