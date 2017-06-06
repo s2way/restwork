@@ -55,6 +55,9 @@ class Server
             @server.use (req, res, next) ->
                 return res.sendUnauthenticated() unless req?.username?
                 next()
+        if @handlers.custom?
+            for handler in @handlers.custom
+                @server.use handler
 
     _registerListeners: ->
         @server.on 'after', (req, res, route, error) ->
