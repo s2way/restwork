@@ -26,7 +26,7 @@ class Server
         @server.close cb
 
 
-    setHealhz: (bool) ->
+    setHealthz: (bool) ->
         @healthz = bool
 
     _createServer: ->
