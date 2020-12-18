@@ -38,8 +38,14 @@ class Server
         server = @restify.createServer()
 
         if @healthz
+
+            server.use (req, res, next) ->
+                req.resource = unless req.route.path instanceof RegExp then req.route.path.replace('/', ' ').trim().split('/') else ''
+                next()
+
             server.get "/healthz", (req, res, next) -> res.send('OK'); next()
             server.get "/", (req, res, next) -> res.send('OK'); next()
+
 
         server.use (req, resp, next) ->
             req.id = uuid.v4()
