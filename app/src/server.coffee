@@ -8,6 +8,7 @@ class Server
         @bunyan = deps?.bunyan or require 'bunyan'
         @oauth = deps?.oauth or require 'restwork-oauth'
         @activeConnections = {}
+        @healthz = false;
 
     start: (port, startCallback, @connTimeout = 30000) ->
         @server = @_createServer()
@@ -24,6 +25,10 @@ class Server
         , @connTimeout
         @server.close cb
 
+
+    setHealhz: (bool) ->
+        @healthz = bool
+
     _createServer: ->
         if @_ssl_certificate? and @_ssl_key?
             return @restify.createServer({
@@ -31,6 +36,11 @@ class Server
                 key: @_ssl_key
             })
         server = @restify.createServer()
+
+        if @healthz
+            server.get "/healthz", (req, res, next) -> res.send('OK'); next()
+            server.get "/", (req, res, next) -> res.send('OK'); next()
+
         server.use (req, resp, next) ->
             req.id = uuid.v4()
             console.log "#{new Date().toISOString()} - REQUEST  # #{req.id} :: method: #{req.route?.method}, path: #{req._url?.path}"
