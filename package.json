@@ -27,7 +27,7 @@
     "node-persist": "0.0.6",
     "node-uuid": "1.4.7",
     "restify": "3.0.3",
-    "restwork-oauth": "git://github.com/Moharu/restwork-oauth.git",
+    "restwork-oauth": "git://github.com/EduardoKanno/restwork-oauth.git",
     "underscore": "1.8.3"
   },
   "devDependencies": {
