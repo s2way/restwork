@@ -22,7 +22,7 @@
   "dependencies": {
     "bunyan": "1.4.0",
     "coffee-script": "1.9.3",
-    "lodash": "4.17.4",
+    "lodash": "4.17.21",
     "mysql": "2.8.0",
     "node-persist": "0.0.6",
     "node-uuid": "1.4.7",
